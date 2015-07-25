@@ -1,8 +1,0 @@
-setup.cfg
-setup.py
-docebo_SSO.egg-info/PKG-INFO
-docebo_SSO.egg-info/SOURCES.txt
-docebo_SSO.egg-info/dependency_links.txt
-docebo_SSO.egg-info/requires.txt
-docebo_SSO.egg-info/top_level.txt
-test/__init__.py
