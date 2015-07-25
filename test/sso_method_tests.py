@@ -4,8 +4,9 @@ import hashlib
 import unittest
 import urlparse
 
-import DoceboUser
-import docebo_sso
+from SSO_libs import DoceboUser
+from SSO_libs import docebo_sso
+
 
 def __main__():
   testmodules = [

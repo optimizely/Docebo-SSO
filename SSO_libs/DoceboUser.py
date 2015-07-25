@@ -1,5 +1,6 @@
-import copy
-import docebo_sso
+from SSO_libs import docebo_sso
+
+
 class SSOUser(docebo_sso.DoceboSSO):
 
   def __init__(self, userid, **kwargs):
