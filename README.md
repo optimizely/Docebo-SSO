@@ -1,9 +1,9 @@
 # Docebo-SSO
-This package is meant to allow a simple python interface to add a third party Single Sign On to the Docebo Learning Management System
+This package is meant to allow a simple python interface to add a third party Single Sign On to the Docebo Learning Management System. Docebo's SSO does not create a user that doesn't exist, or update the credentials of a user that does exist.
 
 ## Usage
 
-There are two ways to use this product, depending on the amount of customization that you need with Docebo.
+There are two ways to use this product, depending on the amount of customization that you need with Docebo sign on.
 
 #### User API
 
@@ -28,7 +28,7 @@ new_user.initialize_keys(
  sso_token='xxxxxx'
 )
 ```
-Finally, you can use the methods in the DoceboUser api to interact with Docebo -- using the parameters you input into the DoceboUser object.
+Finally, you can use the methods in the DoceboUser api to interact with Docebo -- the methods use the parameters you input into the DoceboUser object and generate valid params/api_keys.
 ```sh
 if new_user.verify_existence():
   new_user.update_on_docebo()
@@ -49,6 +49,7 @@ new_user.update_info_locally(
   lastname='dae',
   ...
 )
+```
 
 Available methods are:
 ```sh
@@ -56,15 +57,18 @@ Available methods are:
 initialize_keys(self, domain, api_secret, api_key, sso_secret)
 
 # Verify user exists in Docebo
+# Hits /api/user/checkUsername
 verify_existence(self)
 
 # Update remote user params given local user information
 update_on_docebo(self)
 
 # Create a new user based on local user 
+# Hits /api/user/create
 create(self)
 
 # Delete user
+# Hits /api/user/delete
 delete(self)
 
 # Sign user in (if account exists), and return URL which will sign that user into their docebo account
@@ -74,9 +78,11 @@ signin(self)
 update_info_locally
 ```
 
-```
-####NOTE: A user must be verified to exist (using verify_existence) or have been created by this package to succesfully call 'delete' or 'update_on_docebo', even if the user does already exist.
-### If you know the Docebo Unique ID ('idst') for the user, you can also use 
+
+#### A user must be verified to exist (using verify_existence) or have been created by this package to succesfully call 'delete' or 'update_on_docebo', even if the user does already exist.
+
+### If you know the Docebo Unique ID ('idst') for the user, you can also use: 
+
 ```sh
 new_user.set_docebo_unique_id(1234)
 ```
