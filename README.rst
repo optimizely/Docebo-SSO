@@ -26,7 +26,7 @@ https://www.docebo.com/wp-content/uploads/media/Docebo\_APImanual.pdf
 
 .. code:: sh
 
-    from SSO_libs import docebo_user
+    from doceboSSO import docebo_user
 
     new_user = DoceboUser(
      userid='batman',
@@ -86,7 +86,7 @@ Available methods are:
 
     All of these methods return boolean values for success for easy control flow
 
-    from SSO_libs import docebo_user
+    from doceboSSO import docebo_user
 
     # Initialize user object with keys, secrets and domain
     initialize_keys(self, domain, api_secret, api_key, sso_secret)

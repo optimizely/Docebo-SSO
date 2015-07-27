@@ -4,7 +4,7 @@ import hashlib
 import unittest
 import urlparse
 
-from SSO_libs import docebo_sso
+from doceboSSO import docebo_sso
 
 
 def __main__():
