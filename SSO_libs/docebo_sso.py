@@ -79,7 +79,7 @@ class DoceboSSO(object):
     datestring = self.create_datestring()
     ssoToken = self.create_token(username, datestring)
     redirect_path = self.create_authentication_path(username, datestring, ssoToken)
-    self.send_request_to_docebo(redirect_path, {})
+    #self.send_request_to_docebo(redirect_path, {})
     return redirect_path
 
   def generate_api_hash(self, params):
@@ -107,7 +107,7 @@ class DoceboSSO(object):
     Throws:
       400 error if Docebo cannot resolve request
     """
-    headers = {'X-Authorization:': self.generate_api_hash(params)}
+    headers = {'X-Authorization': self.generate_api_hash(params)}
     response = requests.request(
         "POST",
         url=api_url,

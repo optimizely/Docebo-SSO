@@ -4,7 +4,6 @@ import hashlib
 import unittest
 import urlparse
 
-from SSO_libs import DoceboUser
 from SSO_libs import docebo_sso
 
 

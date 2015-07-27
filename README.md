@@ -3,7 +3,7 @@ This package is meant to allow a simple python interface to add a third party Si
 
 ## Usage
 
-There are two ways to use this product, depending on the amount of customization that you need with Docebo sign on.
+There are two ways to use this package, depending on the amount of customization that you need with Docebo's sign on.
 
 #### User API
 
@@ -53,6 +53,8 @@ new_user.update_info_locally(
 
 Available methods are:
 ```sh
+All of these methods return boolean values for success for easy control flow
+
 # Initialize user object with keys, secrets and domain
 initialize_keys(self, domain, api_secret, api_key, sso_secret)
 
@@ -79,12 +81,12 @@ update_info_locally
 ```
 
 
-#### A user must be verified to exist (using verify_existence) or have been created by this package to succesfully call 'delete' or 'update_on_docebo', even if the user does already exist.
-
-### If you know the Docebo Unique ID ('idst') for the user, you can also use: 
+#### In order to call delete or update_on docebo, the docebo unique-id for that given user is required. 
+#### create() and verify_existence() automatically add this field on success
+### You can also use the following method to add the uid manually.
 
 ```sh
-new_user.set_docebo_unique_id(1234)
+new_user.set_docebo_unique_id(#####)
 ```
 
 #### Methods API
@@ -98,6 +100,8 @@ The api_key, api_secret and sso_secret must still be initialized as in the User 
 
 Available methods are: 
 ```sh
+These methods return the json body of the responses they receive.
+
 # Verify user exists in Docebo
 verify_user(self, params)
 
@@ -105,6 +109,7 @@ verify_user(self, params)
 edit_user(self, params)
 
 # Create a new user given input params
+# If called on a user that already exists, returns None
 create_user(self, params)
 
 # Delete user corresponding to provided unique_id
