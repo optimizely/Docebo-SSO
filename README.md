@@ -12,6 +12,8 @@ To ue the methods, the DoceboUser object must first be instantiated with all of 
 
 A full list of valid user parameters can be found at Docebo's API reference: https://www.docebo.com/wp-content/uploads/media/Docebo_APImanual.pdf
 ```sh
+from SSO_libs import docebo_user
+
 new_user = DoceboUser(
  userid='batman',
  firstname='john',
@@ -55,10 +57,12 @@ Available methods are:
 ```sh
 All of these methods return boolean values for success for easy control flow
 
+from SSO_libs import docebo_user
+
 # Initialize user object with keys, secrets and domain
 initialize_keys(self, domain, api_secret, api_key, sso_secret)
 
-# Verify user exists in Docebo
+# Verify user exists in Docebo (by username)
 # Hits /api/user/checkUsername
 verify_existence(self)
 
