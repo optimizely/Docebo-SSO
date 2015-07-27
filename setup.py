@@ -23,5 +23,5 @@ setup(
     install_requires=[
       'requests>=2.6.0',
     ],
-    test_suite='sso_method_tests',
+    test_suite='sso_test',
 )
