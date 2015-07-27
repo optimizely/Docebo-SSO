@@ -1,0 +1,32 @@
+{
+  "linters" : {
+    "filename" : {
+      "type" : "filename",
+      "include" : "(.*)"
+    },
+    "pep8" : {
+      "type" : "pep8",
+      "include" : "(\\.py$)",
+      "severity" : {
+        "E111" : "disabled",
+        "E113" : "warning",
+        "E114" : "disabled",
+        "E121" : "disabled",
+        "E125" : "disabled",
+        "E129" : "disabled",
+        "E222" : "warning",
+        "E251" : "warning",
+        "E261" : "warning",
+        "E265" : "warning",
+        "E303" : "warning",
+        "E401" : "warning",
+        "E501" : "advice"
+      },
+      "flags": ["--max-line-length=120"]
+    },
+    "spelling" : {
+      "type" : "spelling",
+      "include" : "(.*)"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "base": "git:merge-base(origin/master)",
+  "project.name" : "docebo_sso",
+  "phabricator.uri" : "https://phabricator.optimizely.com",
+  "arc.land.onto.default" : "master"
+}
