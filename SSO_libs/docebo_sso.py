@@ -76,7 +76,6 @@ class DoceboSSO(object):
     Returns:
       Valid signed SSO URL
     """
-    #username = self.get_username_from_email(user.user_id)
     datestring = self.create_datestring()
     ssoToken = self.create_token(username, datestring)
     redirect_path = self.create_authentication_path(username, datestring, ssoToken)
@@ -109,7 +108,6 @@ class DoceboSSO(object):
       400 error if Docebo cannot resolve request
     """
     headers = {'X-Authorization:': self.generate_api_hash(params)}
-    data = urllib.urlencode(params)
     response = requests.request(
         "POST",
         url=api_url,
@@ -171,12 +169,3 @@ class DoceboSSO(object):
     api_url = self.generate_api_url(DELETE_USER_API_URL)
     response = self.send_request_to_docebo(api_url, params)
     return response
-
-  def get_username_from_email(self, user_email):
-    """get email username (before the @) to use as Docebo username"""
-    if user_email is None:
-      return None
-    split_email = user_email.split('@')[0]
-    if split_email is None:
-      return None
-    return user_email.split('@')[0]
