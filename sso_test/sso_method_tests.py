@@ -4,7 +4,8 @@ import hashlib
 import unittest
 import urlparse
 
-from doceboSSO import docebo_user
+from docebo_sso_libs import docebo_user
+from docebo_sso_libs import docebo_sso_methods as docebo_sso
 
 
 def __main__():
@@ -25,18 +26,20 @@ def __main__():
 
   unittest.TextTestRunner().run(suite)
 
-class DoceboUnitTestSSO(unittest.TestCase):
-  current_sso = docebo_user.SSOUser('batman')
-  current_sso.initialize_keys(
-    domain='http://test.docebosaas.com',
-    api_secret='myapisecret',
-    api_key='myapikey',
-    sso_secret='myssosecret'
-  )
+
+class DoceboUnitTestSso(unittest.TestCase):
+
+  def setUp(self):
+    docebo_user.initialize_keys(
+      domain='http://test.docebosaas.com',
+      api_secret='myapisecret',
+      api_key='myapikey',
+      sso_secret='myssosecret'
+    )
 
   def test_create_datestring(self):
     """Test that the datestring is created correctly"""
-    datestring = self.current_sso.create_datestring()
+    datestring = docebo_sso.create_datestring()
     expected = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     self.assertEqual(len(datestring), 14)
     self.assertAlmostEqual(int(datestring), int(expected))
@@ -44,15 +47,15 @@ class DoceboUnitTestSSO(unittest.TestCase):
   def test_create_token(self):
    """Test that SSO token is correctly created """
    username = 'batman'
-   datestring = self.current_sso.create_datestring()
-   sso_token = self.current_sso.create_token('batman', datestring)
+   datestring = docebo_sso.create_datestring()
+   sso_token = docebo_sso.create_token('batman', datestring)
    self.assertEqual(len(sso_token), 32)
    self.assertTrue(isinstance(sso_token, str))
 
    token_hash = hashlib.md5()
    token_hash.update(username + ',')
    token_hash.update(datestring + ',')
-   token_hash.update(self.current_sso.sso_secret)
+   token_hash.update(docebo_sso.USER_KEYS['sso_secret'])
    expected_token = token_hash.hexdigest()
    self.assertEqual(expected_token, sso_token)
 
@@ -60,12 +63,12 @@ class DoceboUnitTestSSO(unittest.TestCase):
     """Test that SSO path is created correctly for redirect"""
     datestring = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     username = 'batman'
-    auth_path = self.current_sso.create_authentication_path(
+    auth_path = docebo_sso.create_authentication_path(
       username,
-      self.current_sso.create_datestring(),
-      self.current_sso.create_token(username, datestring)
+      docebo_sso.create_datestring(),
+      docebo_sso.create_token(username, datestring)
     )
-    url_parts = urlparse.urlparse(auth_path) 
+    url_parts = urlparse.urlparse(auth_path)
     self.assertEqual(url_parts.scheme, 'http')
     self.assertEqual(url_parts.netloc, 'test.docebosaas.com')
     self.assertEqual(url_parts.path, '/doceboLms/index.php')
@@ -81,19 +84,20 @@ class DoceboUnitTestSSO(unittest.TestCase):
   def test_api_hash(self):
    """Test that the api authentication hash was correctly created"""
    params = {'userid': 'bats'}
-   api_hash = self.current_sso.generate_api_hash(params)
+   api_hash = docebo_sso.generate_api_hash(params)
    self.assertEqual(len(api_hash), 68)
    self.assertTrue(isinstance(api_hash, str))
 
    param_string = ','.join(params.values())
-   secret_hash = hashlib.sha1(param_string + ',' + self.current_sso.api_secret)
-   auth_token = base64.b64encode(self.current_sso.api_key + ':' + secret_hash.hexdigest())
+   secret_hash = hashlib.sha1(param_string + ',' + docebo_sso.USER_KEYS['api_secret'])
+   auth_token = base64.b64encode(docebo_sso.USER_KEYS['api_key'] + ':' + secret_hash.hexdigest())
    self.assertEqual(auth_token, api_hash)
+
 
 class DoceboUserTest(unittest.TestCase):
 
   def init_user(self):
-    currUser = docebo_user.SSOUser(
+    currUser = docebo_user.SsoUser(
       userid='batman',
       firstname='bat',
       lastname='man',

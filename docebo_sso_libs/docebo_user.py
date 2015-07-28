@@ -1,7 +1,14 @@
-from doceboSSO import docebo_sso
+import docebo_sso_methods as docebo_sso
 
 
-class SSOUser(docebo_sso.DoceboSSO):
+def initialize_keys(domain, api_secret, api_key, sso_secret):
+  docebo_sso.USER_KEYS['domain'] = domain
+  docebo_sso.USER_KEYS['api_secret'] = api_secret
+  docebo_sso.USER_KEYS['api_key'] = api_key
+  docebo_sso.USER_KEYS['sso_secret'] = sso_secret
+
+
+class SsoUser(object):
 
   def __init__(self, userid, **kwargs):
     """Definition of all characteristics assigned with the given user, stores input as an object field
@@ -43,7 +50,7 @@ class SSOUser(docebo_sso.DoceboSSO):
     returns: boolean for user found
     """
     params = self.generate_user_verify_params()
-    verify_response = self.verify_user(params)
+    verify_response = docebo_sso.verify_user(params)
     did_succeed = verify_response['success']
     if did_succeed:
       self.set_docebo_unique_id(str(verify_response['idst']))
@@ -54,7 +61,7 @@ class SSOUser(docebo_sso.DoceboSSO):
 
     returns: boolean for success"""
     params = self.generate_user_creation_params()
-    create_response = self.create_user(params)
+    create_response = docebo_sso.create_user(params)
     if not create_response:
       return False
     self.set_docebo_unique_id(str(create_response['idst']))
@@ -68,23 +75,23 @@ class SSOUser(docebo_sso.DoceboSSO):
     return: boolean for success
     """
 
-    if not 'idst' in self.user_params:
+    if 'idst' not in self.user_params:
       return False
 
     params = self.generate_delete_user_params()
-    return self.delete_user(params)['success']
+    return docebo_sso.delete_user(params)['success']
 
   def update_on_docebo(self):
-    """updates a docebo user with paramters specified in creating the object
+    """updates a docebo user with parameters specified in creating the object
 
     ***MUST RUN verify_existence() or set_docebo_unique_id() BEFORE RUNNING delete()***
 
     return: boolean value for success or not
     """
-    if not 'idst' in self.user_params:
+    if 'idst' not in self.user_params:
       return False
     params = self.generate_user_edit_params()
-    return self.edit_user(params)['success']
+    return docebo_sso.edit_user(params)['success']
 
   def signin(self):
     """Provides the signed and paramterized URL to sign into an active Docebo account
@@ -92,7 +99,7 @@ class SSOUser(docebo_sso.DoceboSSO):
     returns: URL as a string
     """
     username = self.user_params['userid']
-    return self.setup_valid_sso_path_and_params(username)
+    return docebo_sso.setup_valid_sso_path_and_params(username)
 
   def update_info_locally(self, **kwargs):
     """Updates info for a user locally (in the DoceboUser object). Does overwrite values.
