@@ -1,4 +1,44 @@
-import docebo_sso_methods as docebo_sso
+import copy
+import logging
+
+import methods as docebo_sso
+
+logger = logging.getLogger(__name__)
+
+possible_edit_fields = [
+  'idst',
+  'ext_user_type',
+  'ext_user',
+  'firstname',
+  'lastname',
+  'password',
+  'email',
+]
+
+possible_create_fields = [
+  'userid',
+  'firstname',
+  'lastname',
+  'password',
+  'email',
+  'reg_code',
+  'reg_code_type',
+  'ext_user_type',
+  'ext_user',
+  'role',
+  'language',
+  'orgchart'
+]
+
+possible_delete_fields = [
+  'idst',
+  'ext_user_type',
+  'ext_user'
+]
+
+possible_verify_fields = [
+  'userid'
+]
 
 
 def initialize_keys(domain, api_secret, api_key, sso_secret):
@@ -8,7 +48,7 @@ def initialize_keys(domain, api_secret, api_key, sso_secret):
   docebo_sso.USER_KEYS['sso_secret'] = sso_secret
 
 
-class SsoUser(object):
+class DoceboSsoUser(object):
 
   def __init__(self, userid, **kwargs):
     """Definition of all characteristics assigned with the given user, stores input as an object field
@@ -17,39 +57,29 @@ class SsoUser(object):
 
     args: all appropriate user fields (with username required)
     """
-    self.user_params = kwargs
+    self.user_params = copy.deepcopy(kwargs)
     self.user_params['userid'] = userid
 
   def set_docebo_unique_id(self, unique_id):
     """Allows Docebo unique user id to be defined."""
     self.user_params['idst'] = str(unique_id)
 
-  def generate_user_verify_params(self):
-    """returns dict of appropriate params for user verification"""
-    params = {
-      'userid': self.user_params['userid'],
-      'also_check_as_email': 'false'
-    }
+  def generate_params(self, possible_fields):
+    """returns dict of appropriate params for user deletion"""
+
+    params = {}
+    for field in possible_fields:
+      if field in self.user_params:
+        params[field] = self.user_params[field]
+
     return params
 
-  def generate_user_edit_params(self):
-    """returns dict of appropriate params for user updating"""
-    return self.user_params
-
-  def generate_user_creation_params(self):
-    """returns dict of appropriate params for user creation"""
-    return self.user_params
-
-  def generate_delete_user_params(self):
-    """returns dict of appropriate params for user deletion"""
-    return self.user_params
-
-  def verify_existence(self):
+  def exists(self):
     """Verify whether user already exists in Docebo system
 
     returns: boolean for user found
     """
-    params = self.generate_user_verify_params()
+    params = self.generate_params(possible_verify_fields)
     verify_response = docebo_sso.verify_user(params)
     did_succeed = verify_response['success']
     if did_succeed:
@@ -60,12 +90,12 @@ class SsoUser(object):
     """Creates user with traits as specified
 
     returns: boolean for success"""
-    params = self.generate_user_creation_params()
+    params = self.generate_params(possible_create_fields)
     create_response = docebo_sso.create_user(params)
     if not create_response:
       return False
     self.set_docebo_unique_id(str(create_response['idst']))
-    return create_response
+    return create_response['success']
 
   def delete(self):
     """ deletes user specified by user_id provided
@@ -76,12 +106,13 @@ class SsoUser(object):
     """
 
     if 'idst' not in self.user_params:
+      logger.error('Docebo user unique ID not initialized.')
       return False
 
-    params = self.generate_delete_user_params()
+    params = self.generate_params(possible_delete_fields)
     return docebo_sso.delete_user(params)['success']
 
-  def update_on_docebo(self):
+  def update(self):
     """updates a docebo user with parameters specified in creating the object
 
     ***MUST RUN verify_existence() or set_docebo_unique_id() BEFORE RUNNING delete()***
@@ -89,8 +120,9 @@ class SsoUser(object):
     return: boolean value for success or not
     """
     if 'idst' not in self.user_params:
+      logger.error('Docebo user unique ID not initialized')
       return False
-    params = self.generate_user_edit_params()
+    params = self.generate_params(possible_edit_fields)
     return docebo_sso.edit_user(params)['success']
 
   def signin(self):
@@ -99,14 +131,4 @@ class SsoUser(object):
     returns: URL as a string
     """
     username = self.user_params['userid']
-    return docebo_sso.setup_valid_sso_path_and_params(username)
-
-  def update_info_locally(self, **kwargs):
-    """Updates info for a user locally (in the DoceboUser object). Does overwrite values.
-
-    args: fields and values to be updated
-    """
-    self.user_params.update(kwargs)
-
-
-
+    return docebo_sso.setup_valid_docebo_sso_path_and_params(username)

@@ -54,7 +54,7 @@ object and generate valid params/api\_keys.
 
 .. code:: sh
 
-    if new_user.verify_existence():
+    if new_user.exists():
       new_user.update_on_docebo()
     else:
       new_user.create()
@@ -93,7 +93,7 @@ Available methods are:
 
     # Verify user exists in Docebo
     # Hits /api/user/checkUsername
-    verify_existence(self)
+    exists(self)
 
     # Update remote user params given local user information
     update_on_docebo(self)
@@ -160,4 +160,4 @@ Available methods are:
     delete_user(self, params)
 
     # Sign user in (if account exists), and return URL which will sign that user into their docebo account
-    setup_valid_sso_path_and_params(self, username)
+    setup_valid_docebo_sso_path_and_params(self, username)

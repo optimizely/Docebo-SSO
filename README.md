@@ -32,7 +32,7 @@ new_user.initialize_keys(
 ```
 Finally, you can use the methods in the DoceboUser api to interact with Docebo -- the methods use the parameters you input into the DoceboUser object and generate valid params/api_keys.
 ```sh
-if new_user.verify_existence():
+if new_user.exists():
   new_user.update_on_docebo()
 else:
   new_user.create()
@@ -64,7 +64,7 @@ initialize_keys(self, domain, api_secret, api_key, sso_secret)
 
 # Verify user exists in Docebo (by username)
 # Hits /api/user/checkUsername
-verify_existence(self)
+exists(self)
 
 # Update remote user params given local user information
 update_on_docebo(self)
@@ -86,7 +86,7 @@ update_info_locally
 
 
 #### In order to call delete or update_on docebo, the docebo unique-id for that given user is required. 
-#### create() and verify_existence() automatically add this field on success
+#### create() and exists() automatically add this field on success
 ### You can also use the following method to add the uid manually.
 
 ```sh
@@ -120,7 +120,7 @@ create_user(self, params)
 delete_user(self, params)
 
 # Sign user in (if account exists), and return URL which will sign that user into their docebo account
-setup_valid_sso_path_and_params(self, username)
+setup_valid_docebo_sso_path_and_params(self, username)
 ```
 
 

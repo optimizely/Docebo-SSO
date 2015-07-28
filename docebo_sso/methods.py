@@ -2,6 +2,7 @@ import base64
 import datetime
 import hashlib
 import json
+import logging
 import requests
 import urllib
 import urlparse
@@ -13,6 +14,8 @@ EDIT_USER_API_URL = '/api/user/edit'
 DELETE_USER_API_URL = '/api/user/delete'
 
 USER_KEYS = {}
+
+logger = logging.getLogger(__name__)
 
 
 def create_datestring():
@@ -33,9 +36,8 @@ def create_token(username, datestring):
       Valid hashed SSO token
     """
     token_hash = hashlib.md5()
-    token_hash.update(username + ',')
-    token_hash.update(datestring + ',')
-    token_hash.update(USER_KEYS['sso_secret'])
+    token_string = ','.join([username, datestring, USER_KEYS['sso_secret']])
+    token_hash.update(token_string)
     sso_token = token_hash.hexdigest()
     return sso_token
 
@@ -52,7 +54,7 @@ def create_authentication_path(username, datestring, token):
       Valid signed SSO URL
     """
 
-    location = USER_KEYS['domain'] + '/doceboLms/index.php'
+    auth_path = '/doceboLms/index.php'
     params = {
       'modname': 'login',
       'op': 'confirm',
@@ -62,10 +64,12 @@ def create_authentication_path(username, datestring, token):
     }
 
     # Return the modified redirect URL.
-    return location + '?' + urllib.urlencode(params)
+    url_parts = urlparse.urlsplit(USER_KEYS['domain'])
+
+    return urlparse.urlunparse((url_parts.scheme, url_parts.netloc, auth_path, None, urllib.urlencode(params), None))
 
 
-def setup_valid_sso_path_and_params(username):
+def setup_valid_docebo_sso_path_and_params(username):
     """SSO into users account
 
     Args:
@@ -118,6 +122,7 @@ def send_request_to_docebo(api_url, params):
     try:
       return json.loads(response_json)
     except:
+      logger.error("No response body received")
       return None
 
 

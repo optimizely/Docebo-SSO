@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 
 setup(
-    name='doceboSSO',
+    name='docebo-sso',
     version='0.0.1',
     description='Single Sign On Implementation for the Docebo LMS',
     author='Chris Dee',
@@ -23,5 +23,5 @@ setup(
     install_requires=[
       'requests>=2.6.0',
     ],
-    test_suite='sso_test',
+    test_suite='tests',
 )

@@ -4,33 +4,14 @@ import hashlib
 import unittest
 import urlparse
 
-from docebo_sso_libs import docebo_user
-from docebo_sso_libs import docebo_sso_methods as docebo_sso
-
-
-def __main__():
-  testmodules = [
-    'sso_method_tests',
-    ]
-  suite = unittest.TestSuite()
-
-  for t in testmodules:
-    try:
-        # If the module defines a suite() function, call it to get the suite.
-        mod = __import__(t, globals(), locals(), ['suite'])
-        suitefn = getattr(mod, 'suite')
-        suite.addTest(suitefn())
-    except (ImportError, AttributeError):
-        # else, just load all the test cases from the module.
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
-
-  unittest.TextTestRunner().run(suite)
+from docebo_sso import user
+from docebo_sso import methods as docebo_sso
 
 
 class DoceboUnitTestSso(unittest.TestCase):
 
   def setUp(self):
-    docebo_user.initialize_keys(
+    user.initialize_keys(
       domain='http://test.docebosaas.com',
       api_secret='myapisecret',
       api_key='myapikey',
@@ -69,6 +50,7 @@ class DoceboUnitTestSso(unittest.TestCase):
       docebo_sso.create_token(username, datestring)
     )
     url_parts = urlparse.urlparse(auth_path)
+    print auth_path
     self.assertEqual(url_parts.scheme, 'http')
     self.assertEqual(url_parts.netloc, 'test.docebosaas.com')
     self.assertEqual(url_parts.path, '/doceboLms/index.php')
@@ -79,7 +61,6 @@ class DoceboUnitTestSso(unittest.TestCase):
     self.assertTrue(queries[2].startswith('time'))
     self.assertTrue(queries[3].startswith('token'))
     self.assertEqual(queries[4], 'op=confirm')
-
 
   def test_api_hash(self):
    """Test that the api authentication hash was correctly created"""
@@ -97,7 +78,7 @@ class DoceboUnitTestSso(unittest.TestCase):
 class DoceboUserTest(unittest.TestCase):
 
   def init_user(self):
-    currUser = docebo_user.SsoUser(
+    currUser = user.DoceboSsoUser(
       userid='batman',
       firstname='bat',
       lastname='man',
@@ -124,13 +105,20 @@ class DoceboUserTest(unittest.TestCase):
     currUser.set_docebo_unique_id(1234)
     self.assertEqual(currUser.user_params['idst'], '1234')
 
-  def test_update_user_params(self):
-    """Test that user params are updated correctly on local User copy"""
-    currUser = self.init_user()
-    currUser.update_info_locally(
-      firstname='bruce',
-      lastname='wayne'
-    )
-    self.assertEqual(currUser.user_params['firstname'], 'bruce')
-    self.assertEqual(currUser.user_params['lastname'], 'wayne')
-    self.assertEqual(currUser.user_params['userid'], 'batman')
+if __name__ == 'main':
+  testmodules = [
+    'tests'
+    ]
+  suite = unittest.TestSuite()
+
+  for t in testmodules:
+    try:
+        # If the module defines a suite() function, call it to get the suite.
+        mod = __import__(t, globals(), locals(), ['suite'])
+        suitefn = getattr(mod, 'suite')
+        suite.addTest(suitefn())
+    except (ImportError, AttributeError):
+        # else, just load all the test cases from the module.
+        suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
+
+  unittest.TextTestRunner().run(suite)
