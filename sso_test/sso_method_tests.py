@@ -65,7 +65,7 @@ class DoceboUnitTestSSO(unittest.TestCase):
       self.current_sso.create_datestring(),
       self.current_sso.create_token(username, datestring)
     )
-    url_parts = urlparse.urlparse(auth_path)
+    url_parts = urlparse.urlparse(auth_path) 
     self.assertEqual(url_parts.scheme, 'http')
     self.assertEqual(url_parts.netloc, 'test.docebosaas.com')
     self.assertEqual(url_parts.path, '/doceboLms/index.php')
