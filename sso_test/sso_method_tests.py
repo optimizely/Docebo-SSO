@@ -4,7 +4,7 @@ import hashlib
 import unittest
 import urlparse
 
-from doceboSSO import docebo_sso
+from doceboSSO import docebo_user
 
 
 def __main__():
@@ -26,7 +26,7 @@ def __main__():
   unittest.TextTestRunner().run(suite)
 
 class DoceboUnitTestSSO(unittest.TestCase):
-  current_sso = docebo_sso.DoceboSSO()
+  current_sso = docebo_user.SSOUser('batman')
   current_sso.initialize_keys(
     domain='http://test.docebosaas.com',
     api_secret='myapisecret',
@@ -93,7 +93,7 @@ class DoceboUnitTestSSO(unittest.TestCase):
 class DoceboUserTest(unittest.TestCase):
 
   def init_user(self):
-    currUser = DoceboUser.SSOUser(
+    currUser = docebo_user.SSOUser(
       userid='batman',
       firstname='bat',
       lastname='man',
