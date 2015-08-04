@@ -16,9 +16,9 @@ User API
 ~~~~~~~~
 
 The user API is a simple, flexible set of methods to sync a Docebo user
-with a locally created user object. To ue the methods, the DoceboUser
-object must first be instantiated with all of the information to be
-synced with the user from Docebo
+with a locally created user object. To ue the methods, the User object
+must first be instantiated with all of the information to be synced with
+the user from Docebo
 
 A full list of valid user parameters can be found at Docebo's API
 reference:
@@ -26,9 +26,9 @@ https://www.docebo.com/wp-content/uploads/media/Docebo\_APImanual.pdf
 
 .. code:: sh
 
-    from doceboSSO import docebo_user
+    from docebo_sso import user as docebo_user
 
-    new_user = DoceboUser(
+    new_user = docebo_user.User(
      userid='batman',
      firstname='john',
      lastname='Doe',
@@ -41,21 +41,21 @@ tokens necessary for using Docebo's API
 
 .. code:: sh
 
-    new_user.initialize_keys(
+    docebo_user.initialize_keys(
      domain='http://example.docebosaas.com'
      api_key='xxxxxxxxxx'
      api_secret='xxxxxxxxxx'
      sso_token='xxxxxx'
     )
 
-Finally, you can use the methods in the DoceboUser api to interact with
-Docebo -- the methods use the parameters you input into the DoceboUser
-object and generate valid params/api\_keys.
+Finally, you can use the methods in the User api to interact with Docebo
+-- the methods use the parameters you input into the User object and
+generate valid params/api\_keys.
 
 .. code:: sh
 
     if new_user.exists():
-      new_user.update_on_docebo()
+      new_user.update()
     else:
       new_user.create()
 
@@ -65,20 +65,8 @@ The above is a simple script to create the local user initialized in the
 first step if their userid doesn't exist on Docebo, and update their
 user parameters if they do exist.
 
-redirect\_to will contain a valid, signed, URL to signin to that user's
+redirect\_url will contain a valid, signed, URL to signin to that user's
 account on Docebo that can be redirected to or pasted into a browser.
-
-The following call can also be used to update the specified user
-attributes on the local DoceboUser. This info can then be pushed to
-Docebo/used to create a new user.
-
-.. code:: sh
-
-    new_user.update_info_locally(
-      firstname='jane',
-      lastname='dae',
-      ...
-    )
 
 Available methods are:
 
@@ -86,17 +74,17 @@ Available methods are:
 
     All of these methods return boolean values for success for easy control flow
 
-    from doceboSSO import docebo_user
+    from docebo_sso import user as docebo_user
 
     # Initialize user object with keys, secrets and domain
-    initialize_keys(self, domain, api_secret, api_key, sso_secret)
+    docebo_user.initialize_keys(self, domain, api_secret, api_key, sso_secret)
 
-    # Verify user exists in Docebo
+    # Verify user exists in Docebo (by username)
     # Hits /api/user/checkUsername
     exists(self)
 
-    # Update remote user params given local user information
-    update_on_docebo(self)
+    # Update remote user params from local user information
+    update(self)
 
     # Create a new user based on local user 
     # Hits /api/user/create
@@ -109,14 +97,11 @@ Available methods are:
     # Sign user in (if account exists), and return URL which will sign that user into their docebo account
     signin(self)
 
-    # Update local user's information
-    update_info_locally
+In order to call delete or update, the docebo unique-id for that given user is required.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to call delete or update\_on docebo, the docebo unique-id for that given user is required.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-create() and verify\_existence() automatically add this field on success
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+create() and exists() automatically add this field on success
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can also use the following method to add the uid manually.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,10 +113,10 @@ You can also use the following method to add the uid manually.
 Methods API
 ^^^^^^^^^^^
 
-The second method of interaction is less abstracted, but gives the user
-more control over the params. Where the User API generates params and
-fills in information for the user, the Methods API requires the user to
-input a set of params as a dictionary at every call.
+The second method of interaction is less abstracted, but gives more
+control over the params. Where the User API generates params and fills
+in information for the user, the Methods API requires the user to input
+a set of params as a dictionary at every call.
 
 The correct format for the params generated for each method can be found
 at:
@@ -144,20 +129,22 @@ Available methods are:
 
 .. code:: sh
 
-    These methods return the json body of the responses they receive.
+    from docebo_sso import methods as docebo_methods
+
+    #These methods return the json body of the responses they receive.
 
     # Verify user exists in Docebo
-    verify_user(self, params)
+    docebo_methods.verify_user(self, params)
 
     # Update user params w/input params
-    edit_user(self, params)
+    docebo_methods.edit_user(self, params)
 
     # Create a new user given input params
-    # If called on a user that already exists, returns None
-    create_user(self, params)
+    # Gives an 'empty response' error if user already exists
+    docebo_methods.create_user(self, params)
 
     # Delete user corresponding to provided unique_id
-    delete_user(self, params)
+    docebo_methods.delete_user(self, params)
 
     # Sign user in (if account exists), and return URL which will sign that user into their docebo account
-    setup_valid_docebo_sso_path_and_params(self, username)
+    docebo_methods.setup_valid_docebo_sso_path_and_params(self, username)
