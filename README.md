@@ -1,6 +1,8 @@
 # Docebo-SSO
 This package is meant to allow a simple python interface to add a third party Single Sign On to the Docebo Learning Management System. Docebo's SSO does not create a user that doesn't exist, or update the credentials of a user that does exist.
 
+Install with ```pip install docebo-sso  ```
+
 ## Usage
 
 There are two ways to use this package, depending on the amount of customization that you need with Docebo's sign on.
