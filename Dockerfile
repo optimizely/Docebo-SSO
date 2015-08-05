@@ -1,6 +1,6 @@
 From ubuntu:14.04
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt requirements.txt 
 
 RUN /bin/bash -c 'apt-get install -y python-setuptools && \
                   mkdir -p $HOME/.pip && \
