@@ -78,7 +78,7 @@ class DoceboUnitTestSso(unittest.TestCase):
 class DoceboUserTest(unittest.TestCase):
 
   def init_user(self):
-    currUser = user.DoceboSsoUser(
+    currUser = user.User(
       userid='batman',
       firstname='bat',
       lastname='man',

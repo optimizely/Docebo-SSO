@@ -48,7 +48,7 @@ def initialize_keys(domain, api_secret, api_key, sso_secret):
   docebo_sso.USER_KEYS['sso_secret'] = sso_secret
 
 
-class DoceboSsoUser(object):
+class User(object):
 
   def __init__(self, userid, **kwargs):
     """Definition of all characteristics assigned with the given user, stores input as an object field
