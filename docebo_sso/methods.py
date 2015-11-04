@@ -54,8 +54,9 @@ def create_authentication_path(username, datestring, token):
       Valid signed SSO URL
     """
 
-    auth_path = '/doceboLms/index.php'
+    auth_path = '/lms/index.php'
     params = {
+      'r': 'site/sso',
       'modname': 'login',
       'op': 'confirm',
       'login_user': username.lower(),
