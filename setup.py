@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
     name='docebo-sso',
-    version='0.0.2',
+    version='1.0.0',
     description='Single Sign On Implementation for the Docebo LMS',
     author='Chris Dee',
     author_email='chris.dee@optimizely.com',
