@@ -66,13 +66,10 @@ class User(object):
 
   def generate_params(self, possible_fields):
     """returns dict of appropriate params for user deletion"""
-
-    params = {}
-    for field in possible_fields:
-      if field in self.user_params:
-        params[field] = self.user_params[field]
-
-    return params
+    return {
+      field: self.user_params[field] for field in possible_fields
+      if field in self.user_params
+    }
 
   def exists(self):
     """Verify whether user already exists in Docebo system
@@ -104,7 +101,6 @@ class User(object):
 
     return: boolean for success
     """
-
     if 'idst' not in self.user_params:
       logger.error('Docebo user unique ID not initialized.')
       return False

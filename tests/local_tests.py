@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import base64
 import datetime
 import hashlib
@@ -44,35 +46,45 @@ class DoceboUnitTestSso(unittest.TestCase):
     """Test that SSO path is created correctly for redirect"""
     datestring = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     username = 'batman'
+    token = docebo_sso.create_token(username, datestring)
     auth_path = docebo_sso.create_authentication_path(
       username,
       docebo_sso.create_datestring(),
-      docebo_sso.create_token(username, datestring)
+      token
     )
     url_parts = urlparse.urlparse(auth_path)
-    print auth_path
     self.assertEqual(url_parts.scheme, 'http')
     self.assertEqual(url_parts.netloc, 'test.docebosaas.com')
-    self.assertEqual(url_parts.path, '/doceboLms/index.php')
-    queries = url_parts.query.split('&')
-    self.assertTrue(queries[0].startswith('login_user'))
-    print queries[1]
-    self.assertTrue(queries[1] == ('modname=login'))
-    self.assertTrue(queries[2].startswith('time'))
-    self.assertTrue(queries[3].startswith('token'))
-    self.assertEqual(queries[4], 'op=confirm')
+    self.assertEqual(url_parts.path, '/lms/index.php')
 
-  def test_api_hash(self):
+    query_params = url_parts.query.split('&')
+    expected_query_params = set([
+      'r=site%2Fsso',  # %2F is the urlencoded value of '/'
+      'modname=login',
+      'op=confirm',
+      'login_user=%s' % username,
+      'time=%s' % datestring,
+      'token=%s' % token
+    ])
+    for param in query_params:
+      self.assertTrue(
+        param in expected_query_params,
+        msg='Query param "%s" is not in our expected parameter list.' % param
+      )
+
+  def test_generate_api_hash(self):
    """Test that the api authentication hash was correctly created"""
    params = {'userid': 'bats'}
    api_hash = docebo_sso.generate_api_hash(params)
    self.assertEqual(len(api_hash), 68)
    self.assertTrue(isinstance(api_hash, str))
 
-   param_string = ','.join(params.values())
-   secret_hash = hashlib.sha1(param_string + ',' + docebo_sso.USER_KEYS['api_secret'])
-   auth_token = base64.b64encode(docebo_sso.USER_KEYS['api_key'] + ':' + secret_hash.hexdigest())
-   self.assertEqual(auth_token, api_hash)
+  def test_generate_api_hash__unicode(self):
+    """ Make sure no errors are raised when using unicode strings with non-ascii chars """
+    params = {'userid': u'Renée'}
+    api_hash = docebo_sso.generate_api_hash(params)
+    self.assertEqual(len(api_hash), 68)
+    self.assertTrue(isinstance(api_hash, str))
 
 
 class DoceboUserTest(unittest.TestCase):
@@ -108,7 +120,7 @@ class DoceboUserTest(unittest.TestCase):
 if __name__ == 'main':
   testmodules = [
     'tests'
-    ]
+  ]
   suite = unittest.TestSuite()
 
   for t in testmodules:

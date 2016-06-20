@@ -94,6 +94,9 @@ def generate_api_hash(params):
       valid API hash
     """
     param_string = ','.join(params.values())
+    if isinstance(param_string, unicode):
+      param_string = param_string.encode('utf-8')
+
     secret_hash = hashlib.sha1(param_string + ',' + USER_KEYS['api_secret'])
     auth_token = base64.b64encode(USER_KEYS['api_key'] + ':' + secret_hash.hexdigest())
     return auth_token
